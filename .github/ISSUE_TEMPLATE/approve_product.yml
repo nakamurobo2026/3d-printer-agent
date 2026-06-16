@@ -1,0 +1,23 @@
+name: Approve Product
+description: Approve a selected build candidate from GitHub Issues.
+title: "[APPROVE] selected_office"
+labels:
+  - operation
+  - approve
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Product approval is handled by GitHub Actions. GitHub Pages is read-only.
+  - type: textarea
+    id: command
+    attributes:
+      label: Approval command
+      value: |
+        ```yaml
+        product_id: selected_office
+        action: approve
+        notes: ""
+        ```
+    validations:
+      required: true
