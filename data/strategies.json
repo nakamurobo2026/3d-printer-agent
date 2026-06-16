@@ -1,7 +1,61 @@
 {
   "product_accessibility_handle": {
-    "market_analysis": {"market_summary":"使いにくさ起点の継続需要があり、受注生産の小型3Dプリント品と相性が良い。","target_customer":"既製品が握りにくい、使いにくいユーザー","customer_pain":"既存の取っ手やスイッチが握りにくく使いにくい","buying_motivation":"専用品で毎日の操作負担を減らしたい。","search_intent":"補助ハンドル、操作補助、3Dプリント便利グッズを探している","market_lifetime":"seasonal-to-evergreen","demand_strength":"strong","recommended_price_range":"2480-3680円","go_no_go":"Go"},
-    "competitive_analysis": {"common_complaints":["高い","使いにくい","説明がわかりにくい"],"weak_points":["寸法情報が不足","使用写真が少ない","対応条件が曖昧"],"differentiation_points":["寸法図を明記","使用前後写真を掲載","用途別バリエーション"]},
-    "marketing_strategy": {"headline":"握りにくさをすっきり解決する補助ハンドル","subheadline":"H2D試作、P2S量産の受注生産3Dプリント品。","seo_keywords":["補助ハンドル","3Dプリント","アクセシビリティ","便利グッズ"],"product_page_structure":["課題提起","使用前/使用後","寸法と対応条件","使い方","FAQ"],"short_video_scripts":["握りにくい場面 -> 補助ハンドル装着 -> 操作しやすい状態 -> CTA"],"sns_post_templates":["毎日の小さな使いにくさを3Dプリントで改善。"],"faq":[{"q":"素材は何ですか？","a":"用途に応じてPETGまたはPLA+で製作します。"}]}
+    "market_analysis": {
+      "market_summary": "使いにくさ起点の継続需要があり、受注生産の小型3Dプリント品と相性が良い。",
+      "target_customer": "既製品が握りにくい、使いにくいユーザー",
+      "customer_pain": "既存の取っ手やスイッチが握りにくく使いにくい",
+      "buying_motivation": "専用品で毎日の操作負担を減らしたい。",
+      "search_intent": "補助ハンドル、操作補助、3Dプリント便利グッズを探している",
+      "market_lifetime": "seasonal-to-evergreen",
+      "demand_strength": "strong",
+      "recommended_price_range": "2480-3680円",
+      "go_no_go": "Go"
+    },
+    "competitive_analysis": {
+      "common_complaints": [
+        "高い",
+        "使いにくい",
+        "説明がわかりにくい"
+      ],
+      "weak_points": [
+        "寸法情報が不足",
+        "使用写真が少ない",
+        "対応条件が曖昧"
+      ],
+      "differentiation_points": [
+        "寸法図を明記",
+        "使用前後写真を掲載",
+        "用途別バリエーション"
+      ]
+    },
+    "marketing_strategy": {
+      "headline": "握りにくさをすっきり解決する補助ハンドル",
+      "subheadline": "H2D試作、P2S量産の受注生産3Dプリント品。",
+      "seo_keywords": [
+        "補助ハンドル",
+        "3Dプリント",
+        "アクセシビリティ",
+        "便利グッズ"
+      ],
+      "product_page_structure": [
+        "課題提起",
+        "使用前/使用後",
+        "寸法と対応条件",
+        "使い方",
+        "FAQ"
+      ],
+      "short_video_scripts": [
+        "握りにくい場面 -> 補助ハンドル装着 -> 操作しやすい状態 -> CTA"
+      ],
+      "sns_post_templates": [
+        "毎日の小さな使いにくさを3Dプリントで改善。"
+      ],
+      "faq": [
+        {
+          "q": "素材は何ですか？",
+          "a": "用途に応じてPETGまたはPLA+で製作します。"
+        }
+      ]
+    }
   }
 }

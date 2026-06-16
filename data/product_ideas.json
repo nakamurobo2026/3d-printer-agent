@@ -1,6 +1,34 @@
 [
-  {"id":"product_accessibility_handle","market_id":"opp_accessibility_handle","name":"アクセシビリティ補助ハンドル 標準版","expected_price_jpy":2980,"status":"listing_generated","next_action":"市場分析後に設計指示書生成"},
-  {"id":"product_pet_storage","market_id":"opp_pet_storage","name":"ペット用品清掃・収納パーツ 標準版","expected_price_jpy":1980,"status":"watching","next_action":"レビュー不満点を追加収集"},
-  {"id":"product_cable_organizer","market_id":"opp_cable_organizer","name":"ケーブル整理 標準版","expected_price_jpy":1680,"status":"validated","next_action":"商品ページ構成を確認"},
-  {"id":"product_battery_holder","market_id":"opp_battery_holder","name":"バッテリーホルダー 標準版","expected_price_jpy":2480,"status":"paused","next_action":"Precision Riskが35超のため実測リスク再評価"}
+  {
+    "id": "product_accessibility_handle",
+    "market_id": "opp_accessibility_handle",
+    "name": "アクセシビリティ補助ハンドル 標準版",
+    "expected_price_jpy": 2980,
+    "status": "listing_generated",
+    "next_action": "市場分析後に設計指示書生成"
+  },
+  {
+    "id": "product_pet_storage",
+    "market_id": "opp_pet_storage",
+    "name": "ペット用品清掃・収納パーツ 標準版",
+    "expected_price_jpy": 1980,
+    "status": "watching",
+    "next_action": "レビュー不満点を追加収集"
+  },
+  {
+    "id": "product_cable_organizer",
+    "market_id": "opp_cable_organizer",
+    "name": "ケーブル整理 標準版",
+    "expected_price_jpy": 1680,
+    "status": "validated",
+    "next_action": "商品ページ構成を確認"
+  },
+  {
+    "id": "product_battery_holder",
+    "market_id": "opp_battery_holder",
+    "name": "バッテリーホルダー 標準版",
+    "expected_price_jpy": 2480,
+    "status": "paused",
+    "next_action": "Precision Riskが35超のため実測リスク再評価"
+  }
 ]
