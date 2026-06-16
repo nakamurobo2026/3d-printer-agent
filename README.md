@@ -1,103 +1,152 @@
 # 3D Printer Autonomous AI Agent System
 
-月利益5万円を目標に、オールジャンル市場調査から低リスクに売れる3Dプリント商品だけを選定するシステムです。
+月利益5万円を目標に、公式API・CSV・公開データから市場の不満を集め、Pain Databaseを作ってから商品化候補を判断するシステムです。
+
+## GitHub Pages
+
+Public read-only dashboard:
+
+```text
+https://nakamurobo2026.github.io/3d-printer-agent/
+```
+
+GitHub Pages UI is a market research dashboard, not a product ranking screen. It shows:
+
+- Data Health
+- Top Pain Clusters
+- Opportunity Watch
+- Design Queue
+
+Design Queue is hidden until Data Health passes the evidence gate. The intended reading flow is:
+
+```text
+市場 -> Pain -> Opportunity -> 設計
+```
 
 ## Operation Model
 
-GitHub Pages is read-only. All operations are done with GitHub Issues and GitHub Actions.
+GitHub Pages is read-only. Operations are done with GitHub Actions and CSV uploads.
 
 - View dashboard: GitHub Pages
-- Approve product: product card `Approve` link or GitHub Issue `[APPROVE] product_id`
-- Pause product: product card `Pause` link or GitHub Issue `[PAUSE] product_id`
-- Archive product: product card `Archive` link or GitHub Issue `[ARCHIVE] product_id`
-- Upload review CSV: dashboard header `CSV Upload` link or GitHub Issue `[UPLOAD_CSV]`
-- Run Daily Pipeline: dashboard header `Run Daily Pipeline` link, GitHub Issue `[RUN_DAILY]`, or GitHub Actions `workflow_dispatch`
+- Upload CSV: dashboard header `CSV Upload`
+- Run Daily Pipeline: dashboard header `Run Daily Pipeline` or GitHub Actions `workflow_dispatch`
 - Local FastAPI admin app: deprecated
 
-Dashboard:
+## Market Data Acquisition Layer
 
-https://nakamurobo2026.github.io/3d-printer-agent/
+市場データ取得は、公式API、CSV、公開取得が現実的なデータのみを使います。スクレイピングは禁止です。Amazonレビューの自動取得は禁止し、Amazonは `data/input/reviews/*.csv` からのCSV手動投入のみです。
 
-## 5分運用フロー
+Collectors:
 
-毎日06:00 JSTに `daily-agent.yml` が自動実行され、GitHub Pagesの閲覧専用ダッシュボードが更新されます。手動で確認する日は、以下だけを行います。
+- `RedditCollector`
+- `YouTubeCollector`
+- `GoogleTrendsCollector`
+- `EtsyCollector`
+- `EbayCollector`
+- `RakutenCollector`
+- `YahooShoppingCollector`
+- `CsvReviewCollector`
 
-1. GitHub Pagesを開き、Build Candidatesの `Selection Score`、`Precision Risk`、`Expected Profit`、`Search Trend`、`Top Pain Point` を確認する。
-2. 作る候補は商品カードの `Approve`、保留は `Pause`、除外は `Archive` を押してGitHub Issueを作成する。
-3. AmazonレビューCSVを追加する日は、ヘッダーの `CSV Upload` から `data/input` にアップロードする。
-4. すぐ再集計したい場合は、ヘッダーの `Run Daily Pipeline` から `daily-agent.yml` を手動実行する。
-5. 更新後のGitHub Pagesで、選定結果とDesign Queueを確認する。
+Raw outputs:
 
-## GitHub Issue Commands
+- `data/raw/reddit.json`
+- `data/raw/youtube.json`
+- `data/raw/google_trends.json`
+- `data/raw/etsy.json`
+- `data/raw/ebay.json`
+- `data/raw/rakuten.json`
+- `data/raw/yahoo.json`
+- `data/raw/csv_reviews.json`
 
-Approve:
+Processed outputs:
 
-```yaml
-product_id: selected_office
-action: approve
-notes: ""
-```
+- `data/processed/market_observations.json`
+- `data/processed/data_source_status.json`
+- `data/processed/pain_database.json`
+- `data/processed/pain_clusters.json`
+- `data/processed/market_opportunity_mapping.json`
 
-Pause:
-
-```yaml
-product_id: selected_office
-action: pause
-notes: ""
-```
-
-Archive:
-
-```yaml
-product_id: selected_office
-action: archive
-notes: ""
-```
-
-CSV upload:
+Data source status schema:
 
 ```yaml
-action: upload_csv
-csv_url: ""
-notes: ""
+source:
+enabled:
+status: success | skipped | failed
+reason:
+fetched_count:
+last_fetch_time:
+api_key_present:
+used_in_score:
 ```
 
-```csv
-product_name,genre,title,review,rating
-example,office,使いにくい,交換部品がなくて困る,2
-```
+Scoring Gate:
 
-Daily Pipeline:
+- `evidence_count >= 20`
+- `source_count >= 2`
+- `confidence_score >= 50`
 
-```yaml
-action: run_daily
-notes: ""
-```
+Gateを満たさないPain Clusterは商品候補に進めません。取得件数0の場合はMarket Scoreを計算せず、Dashboardに `実データ未取得` と表示します。
 
-## Architecture
+## GitHub Secrets
+
+Set these repository secrets when available. Missing keys are skipped source-by-source.
+
+- `REDDIT_CLIENT_ID`
+- `REDDIT_CLIENT_SECRET`
+- `REDDIT_USER_AGENT`
+- `YOUTUBE_API_KEY`
+- `ETSY_API_KEY`
+- `EBAY_CLIENT_ID`
+- `EBAY_CLIENT_SECRET`
+- `RAKUTEN_APP_ID`
+- `YAHOO_APP_ID`
+
+## CSV Input
 
 ```text
-AllGenreMarketResearch -> PainDiscovery -> MarketAnalysis -> CompetitiveAnalysis
-PrecisionRisk -> ProfitForecast -> MarketingPotential -> ProductSelection
-DesignBrief -> Human Fusion Design -> Prototype / Sales / Learning
+data/input/reviews/*.csv
 ```
 
-## GitHub Pages Settings
+Required columns:
 
-404が出る場合はGitHub上で以下を設定してください。
+- `source`
+- `category`
+- `product_name`
+- `review_text`
 
-1. Repository の `Settings` を開く
-2. 左メニューの `Pages` を開く
-3. `Build and deployment` で `Source: Deploy from a branch` を選択
-4. `Branch: main` を選択
-5. `Folder: /docs` を選択
-6. `Save` を押す
+Optional columns:
+
+- `rating`
+- `review_date`
+- `price`
+- `url`
+- `product_id`
+- `reviewer_region`
+- `helpful_count`
+
+Supported encodings:
+
+- UTF-8
+- UTF-8 BOM
+- Shift_JIS / CP932
 
 ## GitHub Actions
 
-- `.github/workflows/daily-agent.yml`: main push、手動実行、毎日06:00 JSTで市場調査とPages更新
-- `.github/workflows/build-dashboard.yml`: dashboard生成互換ワークフロー
-- `.github/workflows/issue-ops.yml`: GitHub Issueを操作コマンドとして処理
+- `.github/workflows/daily-agent.yml`: main push, manual run, and daily 06:00 JST market research dashboard update
+- `.github/workflows/build-dashboard.yml`: dashboard generation compatibility workflow
+- `.github/workflows/issue-ops.yml`: GitHub Issue command workflow
+
+## GitHub Pages Settings
+
+If GitHub Pages returns 404, configure:
+
+1. Repository `Settings`
+2. `Pages`
+3. `Build and deployment`
+4. `Source: Deploy from a branch`
+5. `Branch: main`
+6. `Folder: /docs`
+7. `Save`
 
 ## Local Development
 
@@ -106,11 +155,8 @@ python -m venv .venv
 .venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 python -m src.main daily
+python scripts/build_pages.py
 ```
-
-## Deprecated Local Admin App
-
-The local FastAPI admin app is deprecated. Product approval, CSV upload, and Daily Pipeline execution should be performed through GitHub Issues and GitHub Actions.
 
 ## Goal
 
@@ -119,4 +165,5 @@ monthly_profit_target_jpy: 50000
 max_weekly_operations_hours: 3
 inventory_policy: make_to_order
 personal_information_policy: do_not_store
+stub_data_used: false
 ```
