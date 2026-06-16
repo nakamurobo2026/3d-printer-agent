@@ -1,0 +1,28 @@
+name: Upload Review CSV
+description: Add review CSV data through a GitHub Issue.
+title: "[UPLOAD_CSV] amazon_reviews"
+labels:
+  - operation
+  - csv
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Paste CSV content in the fenced block, or provide a URL that GitHub Actions can access.
+  - type: textarea
+    id: command
+    attributes:
+      label: CSV upload command
+      value: |
+        ```yaml
+        action: upload_csv
+        csv_url: ""
+        notes: ""
+        ```
+
+        ```csv
+        product_name,genre,title,review,rating
+        example,office,使いにくい,交換部品がなくて困る,2
+        ```
+    validations:
+      required: true
