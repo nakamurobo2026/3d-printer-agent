@@ -1,0 +1,90 @@
+name: GitHub Issue Operations
+
+on:
+  issues:
+    types:
+      - opened
+      - edited
+      - reopened
+  workflow_dispatch:
+    inputs:
+      action:
+        description: approve, upload_csv, or run_daily
+        required: true
+        default: run_daily
+      product_id:
+        description: Product ID for approve
+        required: false
+      notes:
+        description: Optional notes
+        required: false
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  issue-ops:
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      startsWith(github.event.issue.title, '[APPROVE]') ||
+      startsWith(github.event.issue.title, '[UPLOAD_CSV]') ||
+      startsWith(github.event.issue.title, '[CSV]') ||
+      startsWith(github.event.issue.title, '[RUN_DAILY]') ||
+      startsWith(github.event.issue.title, '[DAILY]')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Write issue body
+        if: github.event_name == 'issues'
+        env:
+          ISSUE_BODY: ${{ github.event.issue.body }}
+        run: python -c "import os, pathlib; pathlib.Path('issue_body.md').write_text(os.environ.get('ISSUE_BODY',''), encoding='utf-8')"
+
+      - name: Handle issue operation
+        if: github.event_name == 'issues'
+        run: python scripts/github_issue_ops.py --title "${{ github.event.issue.title }}" --body-file issue_body.md --issue-number "${{ github.event.issue.number }}"
+
+      - name: Handle manual operation
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          cat > issue_body.md <<'EOF'
+          product_id: "${{ inputs.product_id }}"
+          action: "${{ inputs.action }}"
+          notes: "${{ inputs.notes }}"
+          EOF
+          python scripts/github_issue_ops.py --title "[${{ inputs.action }}] ${{ inputs.product_id }}" --body-file issue_body.md
+
+      - name: Commit generated files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/*.json data/*.csv docs/index.html docs/data/*.json
+          git diff --cached --quiet || git commit -m "Apply GitHub issue operation [skip ci]"
+          git push
+
+      - name: Comment result
+        if: github.event_name == 'issues'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const body = fs.readFileSync('data/github_issue_result.md', 'utf8');
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body
+            });
