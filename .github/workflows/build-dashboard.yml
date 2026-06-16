@@ -1,4 +1,4 @@
-name: Build Dashboard
+name: Build Dashboard Docs
 
 on:
   push:
@@ -8,19 +8,15 @@ on:
 
 permissions:
   contents: write
-  pages: write
-  id-token: write
-
-concurrency:
-  group: pages
-  cancel-in-progress: false
 
 jobs:
-  build:
+  build-docs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -33,32 +29,16 @@ jobs:
       - name: Generate dashboard data
         run: python -m src.main daily
 
-      - name: Build GitHub Pages assets
+      - name: Build docs for GitHub Pages
         run: python scripts/build_pages.py
 
-      - name: Configure GitHub Pages
-        uses: actions/configure-pages@v5
+      - name: Ensure Pages marker
+        run: touch docs/.nojekyll
 
-      - name: Commit generated dashboard data
+      - name: Commit docs and data
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/*.json docs/index.html docs/data/*.json
-          git diff --cached --quiet || git commit -m "Update generated dashboard data [skip ci]"
+          git add data/*.json docs/index.html docs/.nojekyll docs/data/*.json
+          git diff --cached --quiet || git commit -m "Update GitHub Pages dashboard data [skip ci]"
           git push
-
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: docs
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
