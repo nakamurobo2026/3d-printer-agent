@@ -1,28 +1,62 @@
 # 3D Printer Autonomous AI Agent System
 
-3Dプリンター事業で月利益5万円を目標に、商品候補の市場スコア、Precision Risk、利益予測、商品ステータスを管理するローカル管理アプリです。
+月利益5万円を目標に、オールジャンル市場調査から低リスクに売れる3Dプリント商品だけを選定するシステムです。
 
-## GitHub Pages
+## Operation Model
 
-公開用の閲覧専用ダッシュボード:
+GitHub Pages is read-only. All operations are done with GitHub Issues and GitHub Actions.
+
+- View dashboard: GitHub Pages
+- Approve product: GitHub Issue `[APPROVE] product_id`
+- Upload review CSV: GitHub Issue `[UPLOAD_CSV]`
+- Run Daily Pipeline: GitHub Issue `[RUN_DAILY]` or GitHub Actions `workflow_dispatch`
+- Local FastAPI admin app: deprecated
+
+Dashboard:
 
 https://nakamurobo2026.github.io/3d-printer-agent/
 
-GitHub Pages版は閲覧専用です。商品承認、CSVアップロード、Daily Pipeline実行などの操作機能はローカル版のみで利用します。
+## GitHub Issue Commands
 
-公開対象ファイル:
+Approve:
+
+```yaml
+product_id: selected_office
+action: approve
+notes: ""
+```
+
+CSV upload:
+
+```yaml
+action: upload_csv
+csv_url: ""
+notes: ""
+```
+
+```csv
+product_name,genre,title,review,rating
+example,office,使いにくい,交換部品がなくて困る,2
+```
+
+Daily Pipeline:
+
+```yaml
+action: run_daily
+notes: ""
+```
+
+## Architecture
 
 ```text
-docs/index.html
-docs/data/latest_snapshot.json
-docs/data/opportunities.json
-docs/data/product_ideas.json
-docs/data/listing_drafts.json
+AllGenreMarketResearch -> PainDiscovery -> MarketAnalysis -> CompetitiveAnalysis
+PrecisionRisk -> ProfitForecast -> MarketingPotential -> ProductSelection
+DesignBrief -> Human Fusion Design -> Prototype / Sales / Learning
 ```
 
 ## GitHub Pages Settings
 
-404が出る場合は、GitHub上で以下を設定してください。
+404が出る場合はGitHub上で以下を設定してください。
 
 1. Repository の `Settings` を開く
 2. 左メニューの `Pages` を開く
@@ -30,48 +64,24 @@ docs/data/listing_drafts.json
 4. `Branch: main` を選択
 5. `Folder: /docs` を選択
 6. `Save` を押す
-7. 数十秒から数分待って `https://nakamurobo2026.github.io/3d-printer-agent/` を再読み込みする
 
 ## GitHub Actions
 
-`.github/workflows/build-dashboard.yml` は main へのpush時に以下を実行します。
+- `.github/workflows/build-dashboard.yml`: main push、手動実行、毎日06:00 JSTで市場調査とPages更新
+- `.github/workflows/issue-ops.yml`: GitHub Issueを操作コマンドとして処理
 
-1. Python環境をセットアップ
-2. `python -m src.main daily` で dashboard data を生成
-3. `python scripts/build_pages.py` で `docs/index.html` と `docs/data/*.json` を更新
-4. `docs/.nojekyll` を作成
-5. 生成済みの `docs/` と `data/*.json` を main にコミットできる状態にする
-
-GitHub Pages自体の公開元は、上記の通り `main` ブランチの `/docs` に設定します。
-
-## Local Admin App
-
-ローカル版では次を利用できます。
-
-- 商品承認、停止、アーカイブ
-- AmazonレビューCSVアップロード
-- Daily Pipeline実行
-- 商品詳細確認
-
-```powershell
-start_dashboard.bat
-```
-
-または:
+## Local Development
 
 ```powershell
 python -m venv .venv
 .venv\Scripts\Activate.ps1
 pip install -r requirements.txt
-python -m src.server
+python -m src.main daily
 ```
 
-ブラウザで `http://127.0.0.1:8000` を開きます。
+## Deprecated Local Admin App
 
-## Modes
-
-- GitHub Pages: 閲覧専用
-- Local FastAPI: 承認、CSVアップロード、Daily Pipeline実行
+The local FastAPI admin app is deprecated. Product approval, CSV upload, and Daily Pipeline execution should be performed through GitHub Issues and GitHub Actions.
 
 ## Goal
 
