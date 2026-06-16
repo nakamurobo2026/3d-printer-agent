@@ -56,3 +56,7 @@ max_weekly_operations_hours: 3
 inventory_policy: make_to_order
 personal_information_policy: do_not_store
 ```
+
+## Sync
+
+This repository is connected to the local Codex project and deploys the read-only dashboard from `docs/`.
