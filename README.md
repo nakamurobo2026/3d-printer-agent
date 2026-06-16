@@ -7,14 +7,26 @@
 GitHub Pages is read-only. All operations are done with GitHub Issues and GitHub Actions.
 
 - View dashboard: GitHub Pages
-- Approve product: GitHub Issue `[APPROVE] product_id`
-- Upload review CSV: GitHub Issue `[UPLOAD_CSV]`
-- Run Daily Pipeline: GitHub Issue `[RUN_DAILY]` or GitHub Actions `workflow_dispatch`
+- Approve product: product card `Approve` link or GitHub Issue `[APPROVE] product_id`
+- Pause product: product card `Pause` link or GitHub Issue `[PAUSE] product_id`
+- Archive product: product card `Archive` link or GitHub Issue `[ARCHIVE] product_id`
+- Upload review CSV: dashboard header `CSV Upload` link or GitHub Issue `[UPLOAD_CSV]`
+- Run Daily Pipeline: dashboard header `Run Daily Pipeline` link, GitHub Issue `[RUN_DAILY]`, or GitHub Actions `workflow_dispatch`
 - Local FastAPI admin app: deprecated
 
 Dashboard:
 
 https://nakamurobo2026.github.io/3d-printer-agent/
+
+## 5分運用フロー
+
+毎日06:00 JSTに `daily-agent.yml` が自動実行され、GitHub Pagesの閲覧専用ダッシュボードが更新されます。手動で確認する日は、以下だけを行います。
+
+1. GitHub Pagesを開き、Build Candidatesの `Selection Score`、`Precision Risk`、`Expected Profit`、`Search Trend`、`Top Pain Point` を確認する。
+2. 作る候補は商品カードの `Approve`、保留は `Pause`、除外は `Archive` を押してGitHub Issueを作成する。
+3. AmazonレビューCSVを追加する日は、ヘッダーの `CSV Upload` から `data/input` にアップロードする。
+4. すぐ再集計したい場合は、ヘッダーの `Run Daily Pipeline` から `daily-agent.yml` を手動実行する。
+5. 更新後のGitHub Pagesで、選定結果とDesign Queueを確認する。
 
 ## GitHub Issue Commands
 
@@ -23,6 +35,22 @@ Approve:
 ```yaml
 product_id: selected_office
 action: approve
+notes: ""
+```
+
+Pause:
+
+```yaml
+product_id: selected_office
+action: pause
+notes: ""
+```
+
+Archive:
+
+```yaml
+product_id: selected_office
+action: archive
 notes: ""
 ```
 
@@ -67,7 +95,8 @@ DesignBrief -> Human Fusion Design -> Prototype / Sales / Learning
 
 ## GitHub Actions
 
-- `.github/workflows/build-dashboard.yml`: main push、手動実行、毎日06:00 JSTで市場調査とPages更新
+- `.github/workflows/daily-agent.yml`: main push、手動実行、毎日06:00 JSTで市場調査とPages更新
+- `.github/workflows/build-dashboard.yml`: dashboard生成互換ワークフロー
 - `.github/workflows/issue-ops.yml`: GitHub Issueを操作コマンドとして処理
 
 ## Local Development
